@@ -1,3 +1,4 @@
+import java.util.regex.Pattern;
 
 public class Tokenizer {
 
@@ -26,7 +27,7 @@ public class Tokenizer {
 
         char peek = it.peekChar();
         if (Character.isDigit(peek)) {
-            return Uint_Literal();
+            return UintOrDouble_Literal();
         } else if (Character.isAlphabetic(peek)||peek == '_') {
             return Ident();
         } else if(peek == '"'){
@@ -40,7 +41,7 @@ public class Tokenizer {
         }
     }
 
-    private Token Uint_Literal() throws TokenizeError {
+    private Token UintOrDouble_Literal() throws TokenizeError {
         // 直到查看下一个字符不是数字为止:
         // -- 前进一个字符，并存储这个字符
         //
@@ -51,14 +52,15 @@ public class Tokenizer {
         Pos startPos = it.currentPos();
         char peek = it.peekChar();
         String num = "";
-        while(Character.isDigit(peek)){
+        while(Character.isDigit(peek)||peek=='.'||peek=='e'||peek=='E'||peek=='+'||peek=='-'){
             num += it.nextChar();
             peek = it.peekChar();
         }
-        if(peek != '.'){
-            Pos endPos = it.currentPos();
-            long value = Long.parseLong(num);
-            return new Token(TokenType.UINT_LITERAL,value,startPos,endPos);
+        if(Pattern.matches("[0-9]+", num)){
+            return new Token(TokenType.UINT_LITERAL,Long.parseLong(num),startPos,it.currentPos());
+        }
+        else if(Pattern.matches("[0-9]+.[0-9]+([eE][-+]?[0-9]+)?", num)){
+            return new Token(TokenType.DOUBLE_LITERAL,Double.parseDouble(num),startPos,it.currentPos());
         }
         //拓展C0，浮点数
         else{

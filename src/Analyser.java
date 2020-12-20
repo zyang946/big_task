@@ -670,7 +670,7 @@ public final class Analyser {
             instructions.add(new Instruction(OperationType.push,changeDouble(token.getValue())));
         }
         else{
-            type = "String";
+            type = "int";
             Token token = next();
             globalTable.put((String)token.getValue(),new GlobalEntry(true,((String)token.getValue()).length()));
             instructions.add(new Instruction(OperationType.push,(long) globalNum));
@@ -679,7 +679,15 @@ public final class Analyser {
     }
     
     private long changeDouble(Object value) {
-        return 0;
+        String binary = Long.toBinaryString(Double.doubleToRawLongBits((Double) value));
+        long aws = 0;
+        long xi = 1;
+        for(int i=binary.length()-1; i>=0; i--){
+            if(binary.charAt(i) == '1')
+                aws += xi;
+            xi *=2;
+        }
+        return aws;
     }
 
     /**
