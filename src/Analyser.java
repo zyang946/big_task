@@ -714,7 +714,6 @@ public final class Analyser {
         Instruction instruction;
         expect(TokenType.L_PAREN);
         if(library!=null){
-            globalTable.put(name,new GlobalEntry(true, name.length()));
             instruction = new Instruction(OperationType.callname,globalNum);
             //globalNum++
             type = library.returnType;
@@ -744,6 +743,7 @@ public final class Analyser {
         op.pop();
         instruction.setX(globalNum);
         instructions.add(instruction);
+        globalTable.put(name,new GlobalEntry(true, name.length()));
         globalNum++;
         return type;
     }
