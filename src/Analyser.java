@@ -354,7 +354,7 @@ public final class Analyser {
     public void analyseBlock_stmt() throws CompileError{
         expect(TokenType.L_BRACE);
         floor++;
-        if(check(TokenType.R_BRACE))
+        while(!check(TokenType.R_BRACE))
             analyseStmt();
         expect(TokenType.R_BRACE);
         for (Iterator<Map.Entry<String, SymbolEntry>> it = symbolTable.entrySet().iterator(); it.hasNext();){
