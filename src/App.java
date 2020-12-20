@@ -7,8 +7,8 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) throws FileNotFoundException, CompileError{
-            //InputStream input = new FileInputStream(args[0]);
-            InputStream input = new FileInputStream("1.txt");
+            InputStream input = new FileInputStream(args[0]);
+            //InputStream input = new FileInputStream("1.txt");
             Scanner scanner = new Scanner(input);
             StringIter it = new StringIter(scanner);
             Tokenizer tokenizer = new Tokenizer(it);
@@ -23,8 +23,8 @@ public class App {
                 System.out.println(bytes.get(i));
             }
 
-            //DataOutputStream output = new DataOutputStream(new FileOutputStream(new File(args[1])));
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(new File("2.txt")));
+            DataOutputStream output = new DataOutputStream(new FileOutputStream(new File(args[1])));
+            //DataOutputStream output = new DataOutputStream(new FileOutputStream(new File("2.txt")));
             try {
 				output.write(result);
 			} catch (IOException e) {
