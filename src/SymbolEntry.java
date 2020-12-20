@@ -133,21 +133,23 @@ public class SymbolEntry {
     public static HashMap<String, SymbolEntry> getLibraryTable(){
         HashMap<String, SymbolEntry> libraryTable = new HashMap<>();
         HashMap<String,SymbolEntry> params = new HashMap<>();
+        HashMap<String,SymbolEntry> params1 = new HashMap<>();
+        HashMap<String,SymbolEntry> params2 = new HashMap<>();
         libraryTable.put("getint",new SymbolEntry(false,"void",true,0,true,params,"int"));
         libraryTable.put("getdouble",new SymbolEntry(false,"void",true,0,true,params,"double"));
         libraryTable.put("getchar",new SymbolEntry(false,"void",true,0,true,params,"int"));
         libraryTable.put("putln",new SymbolEntry(false,"void",true,0,true,params,"void"));
         SymbolEntry param1 = new SymbolEntry();
         param1.setType("int");
-        params.put("1",param1);
-        libraryTable.put("putint",new SymbolEntry(false,"void",true,0,true,params,"void"));
-        libraryTable.put("putchar",new SymbolEntry(false,"void",true,0,true,params,"void"));
-        libraryTable.put("putstr",new SymbolEntry(false,"void",true,0,true,params,"void"));
-        params.remove("1");
+        params1.put("1",param1);
+        libraryTable.put("putint",new SymbolEntry(false,"void",true,0,true,params1,"void"));
+        libraryTable.put("putchar",new SymbolEntry(false,"void",true,0,true,params1,"void"));
+        libraryTable.put("putstr",new SymbolEntry(false,"void",true,0,true,params1,"void"));
+        
         SymbolEntry param2 = new SymbolEntry();
         param2.setType("double");
-        params.put("1",param2);
-        libraryTable.put("getchar",new SymbolEntry(false,"void",true,0,true,params,"void"));
+        params2.put("1",param2);
+        libraryTable.put("putdouble",new SymbolEntry(false,"void",true,0,true,params2,"void"));
         
         return libraryTable;
     } 

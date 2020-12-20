@@ -57,7 +57,7 @@ public class Tokenizer {
         }
         if(peek != '.'){
             Pos endPos = it.currentPos();
-            int value = Integer.parseInt(num);
+            long value = Long.parseLong(num);
             return new Token(TokenType.UINT_LITERAL,value,startPos,endPos);
         }
         //拓展C0，浮点数

@@ -306,7 +306,7 @@ public final class Analyser {
         expect(TokenType.COLON);
         Token type = expect(TokenType.ty);
         symbol.setType((String)type.getValue());
-        addSymbol(i+"", token.getStartPos(), isConstant, (String)type.getValue(), false, false, null, null, floor+1, -1, -1);
+        addSymbol((String) token.getValue(),token.getStartPos(), isConstant, (String)type.getValue(), false, false, null, null, floor+1, -1, -1);
         localNum++;
         return symbol; 
     }
@@ -323,6 +323,7 @@ public final class Analyser {
 
      */
     public void analyseStmt() throws CompileError{
+        // System.out.println(peek().getTokenType() + (String)_peek().getValue());
         if(check(TokenType.SEMICOLON))
             analyseEmpty_stmt();
         else if(check(TokenType.L_BRACE))
@@ -337,6 +338,19 @@ public final class Analyser {
             analyseIf_stmt();
         else if(check(TokenType.WHILE_KW))
             analyseWhile_stmt();
+        else
+            analyseExpr_stmt();
+    }
+
+    /**
+     * expr_stmt -> expr ';'
+     * @throws CompileError
+     */
+    public void analyseExpr_stmt() throws CompileError{
+        String type = analyseExpr();
+        while (!op.empty())
+            Operation.OperationInstruction(op.pop(), instructions, type);
+        expect(TokenType.SEMICOLON);
     }
 
     /**
@@ -375,7 +389,7 @@ public final class Analyser {
             if(!runningFunction.getReturnType().equals("void")){
                 instructions.add(new Instruction(OperationType.arga,0));
                 String type = analyseExpr();
-                if(!runningFunction.getReturnType().equals("type"))
+                if(!runningFunction.getReturnType().equals(type))
                     throw new AnalyzeError(ErrorCode.Break, peekedToken.getStartPos());
                 while(!op.empty()){
                     Operation.OperationInstruction(op.pop(), instructions, type);
@@ -405,8 +419,10 @@ public final class Analyser {
                 instructions.add(new Instruction(OperationType.globa,-1));
             else
                 instructions.add(new Instruction(OperationType.loca,-1));
+            expect(TokenType.ASSIGN);
             String newtype = analyseExpr();
-            if(newtype!=type)
+            //System.out.println(newtype);
+            if(!newtype.equals(type))
                 throw new AnalyzeError(ErrorCode.Break, token.getStartPos());
             while(!op.empty())
                 Operation.OperationInstruction(op.pop(), instructions, type);
@@ -439,8 +455,9 @@ public final class Analyser {
                 instructions.add(new Instruction(OperationType.globa,-1));
             else
                 instructions.add(new Instruction(OperationType.loca,-1));
+            expect(TokenType.ASSIGN);
             String newtype = analyseExpr();
-            if(newtype!=type)
+            if(!newtype.equals(type))
                 throw new AnalyzeError(ErrorCode.Break, token.getStartPos());
             while(!op.empty())
                 Operation.OperationInstruction(op.pop(), instructions, type);
@@ -465,7 +482,7 @@ public final class Analyser {
         String type = analyseExpr();
         if(!op.empty())
             Operation.OperationInstruction(op.pop(), instructions, type);
-        if(!type.equals("int")||!type.equals("double"))
+        if(!type.equals("int")&&!type.equals("double"))
             throw new AnalyzeError(ErrorCode.Break, peekedToken.getStartPos());
         instructions.add(new Instruction(OperationType.br_true,1));
         Instruction jumpTrue = new Instruction(OperationType.br,0);
@@ -487,11 +504,12 @@ public final class Analyser {
                 else 
                     throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
             }
-            else{
-                Instruction jumpfalse = new Instruction(OperationType.br,0);
-                instructions.add(jumpfalse);
-                jumpTrue.setX(len-init+1);
-                if(check(TokenType.ELSE_KW)){
+        }
+        else{
+            Instruction jumpfalse = new Instruction(OperationType.br,0);
+            instructions.add(jumpfalse);
+            jumpTrue.setX(len-init+1);
+            if(check(TokenType.ELSE_KW)){
                 expect(TokenType.ELSE_KW);
                 if(check(TokenType.IF_KW))
                     analyseIf_stmt();
@@ -501,9 +519,8 @@ public final class Analyser {
                 }
                 else 
                     throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
-                }
-                jumpfalse.setX(instructions.size()-len-1);
             }
+            jumpfalse.setX(instructions.size()-len-1);
         }
     }
 
@@ -520,7 +537,7 @@ public final class Analyser {
         String type = analyseExpr();
         if(!op.empty())
             Operation.OperationInstruction(op.pop(), instructions, type);
-        if(!type.equals("int")||!type.equals("double"))
+        if(!type.equals("int")&&!type.equals("double"))
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         instructions.add(new Instruction(OperationType.br_true,1));
         Instruction jump = new Instruction(OperationType.br,0);
@@ -553,21 +570,25 @@ public final class Analyser {
      */
     private String analyseExpr() throws CompileError{
         String type = "";
+        Token test = peek();
+        System.out.println(test.getTokenType());
         if(check(TokenType.MINUS))
             type = analyseNegate_expr();
         else if(check(TokenType.IDENT)){
             Token token = next();
             String name = (String) token.getValue();
             SymbolEntry symbol = symbolTable.get(name);
-            SymbolEntry library = libraryTable.get("name");
-            library.setFloor(floor);
-            library.setLocalId(-1);
-            library.setGlobalId(-1);
-            if(symbol == null){
-                if(library ==null)
-                    throw new AnalyzeError(ErrorCode.NotDeclared,null);
+            SymbolEntry library = libraryTable.get(name);
+            System.out.println(name);
+            if(library!=null){
+                library.setFloor(floor);
+                library.setLocalId(-1);
+                library.setGlobalId(-1);
+                System.out.println("1");
             }
-            if(check(TokenType.EQ))
+            if(symbol == null&& library==null)
+                    throw new AnalyzeError(ErrorCode.NotDeclared,null);
+            if(check(TokenType.ASSIGN))
                 type = analyseAssign_expr(symbol);
             else if(check(TokenType.L_PAREN)){
                 type = analyseCall_expr(token,symbol,library);
@@ -641,6 +662,7 @@ public final class Analyser {
             type = "int";
             Token token = next();
             instructions.add(new Instruction(OperationType.push,(long)token.getValue()));
+            return "int";
         }
         else if(check(TokenType.DOUBLE_LITERAL)){
             type = "double";
@@ -697,7 +719,8 @@ public final class Analyser {
             type = FunctionTable.get(name).getReturnType();
         }
         op.push(TokenType.L_PAREN);
-        if(FunctionTable.get(name).getReturnType().equals("int")||FunctionTable.get(name).getReturnType().equals("int"))
+        if(FunctionTable.get(name)!=null&&(FunctionTable.get(name).getReturnType().equals("int")
+                || FunctionTable.get(name).getReturnType().equals("double")))
             instructions.add(new Instruction(OperationType.stackalloc,1));
         else if(name.equals("getint")||name.equals("getdouble")||name.equals("getchar"))
             instructions.add(new Instruction(OperationType.stackalloc,1));
@@ -722,8 +745,10 @@ public final class Analyser {
         HashMap<String,SymbolEntry> params = symbol.getParams();
         int paramNum =params.size();
         String type = analyseExpr();
+        System.out.println(type);
         while(!op.empty()&&op.peek()!=TokenType.L_PAREN)
             Operation.OperationInstruction(op.pop(),instructions,type);
+        System.out.println(params.get(num+"").getType());
         if(!type.equals(params.get(num+"").getType())){
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         }
@@ -750,9 +775,10 @@ public final class Analyser {
         expect(TokenType.L_PAREN);
         op.push(TokenType.L_PAREN);
         String type = analyseExpr();
+        System.out.println(type);
         expect(TokenType.R_PAREN);
 
-        while(op.peek()!=TokenType.L_PAREN)
+        while(op.peek().equals(TokenType.L_PAREN))
             Operation.OperationInstruction(op.pop(),instructions,type);
         op.pop();
         return type;
@@ -789,7 +815,7 @@ public final class Analyser {
         Token token = next();
         String newtype = analyseExpr();
         if(!op.empty()){
-            if(Operation.getPriority(op.pop(),token.getTokenType())){
+            if(Operation.getPriority(op.peek(),token.getTokenType())){
                 Operation.OperationInstruction(op.pop(), instructions, type);
             }
         }
