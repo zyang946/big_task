@@ -1,5 +1,6 @@
 
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 
@@ -42,7 +43,7 @@ public final class Analyser {
         this.instructions = new ArrayList<>();
     }
 
-    public List<Instruction> analyse() throws CompileError {
+    public List<Instruction> analyse() throws CompileError,FileNotFoundException{
         analyseProgram();
         return instructions;
     }
@@ -246,6 +247,7 @@ public final class Analyser {
         SymbolEntry symbol = symbolTable.get(name);
         if(!check(TokenType.R_PAREN))
             params = analyseFunction_param_list(name,symbol);
+        expect(TokenType.R_PAREN);
         expect(TokenType.ARROW);
         Token type = expect(TokenType.ty);
         returnType =  (String) type.getValue();
@@ -352,7 +354,7 @@ public final class Analyser {
     public void analyseBlock_stmt() throws CompileError{
         expect(TokenType.L_BRACE);
         floor++;
-        while(check(TokenType.R_BRACE))
+        if(check(TokenType.R_BRACE))
             analyseStmt();
         expect(TokenType.R_BRACE);
         for (Iterator<Map.Entry<String, SymbolEntry>> it = symbolTable.entrySet().iterator(); it.hasNext();){
