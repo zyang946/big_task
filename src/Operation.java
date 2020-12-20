@@ -13,26 +13,26 @@ public class Operation{
         return false;
     }
     public static int getOrder(TokenType t){
-        if(t==TokenType.L_PAREN)
+        if(t.equals(TokenType.L_PAREN))
             return 1;
-        else if(t==TokenType.NEG)
+        else if(t.equals(TokenType.NEG))
             return 2;
-        else if(t==TokenType.AS)
+        else if(t.equals(TokenType.AS))
             return 3;
-        else if(t==TokenType.MINUS||t==TokenType.DIV)
+        else if(t.equals(TokenType.MINUS)||t.equals(TokenType.DIV))
             return 4;
-        else if(t==TokenType.PLUS||t==TokenType.MINUS)
+        else if(t.equals(TokenType.PLUS)||t.equals(TokenType.MINUS))
             return 5;
-        else if(t==TokenType.EQ||t==TokenType.NEQ||t==TokenType.LT||t==TokenType.GT||t==TokenType.LE||t==TokenType.GE)
+        else if(t.equals(TokenType.EQ)||t.equals(TokenType.NEQ)||t.equals(TokenType.LT)||t.equals(TokenType.GT)||t.equals(TokenType.LE)||t.equals(TokenType.GE))
             return 6;
-        else if(t==TokenType.ASSIGN)
+        else if(t.equals(TokenType.ASSIGN))
             return 7;
-        else if(t==TokenType.L_PAREN)
+        else if(t.equals(TokenType.L_PAREN))
             return 8;
         return 0;
     }
     public static void OperationInstruction(TokenType t,ArrayList<Instruction> instructions,String type)throws CompileError{
-        if(t==TokenType.NEG){
+        if(t.equals(TokenType.NEG)){
             //“- neg”
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.neg_i,-1));
@@ -41,7 +41,7 @@ public class Operation{
             else
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
         }
-        else if(t==TokenType.PLUS){
+        else if(t.equals(TokenType.PLUS)){
             //"+"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.add_i,-1));
@@ -50,7 +50,7 @@ public class Operation{
             else
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
         }
-        else if(t==TokenType.MINUS){
+        else if(t.equals(TokenType.MINUS)){
             //"- minus"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.sub_i));
@@ -59,7 +59,7 @@ public class Operation{
             else
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
         }
-        else if(t==TokenType.MUL){
+        else if(t.equals(TokenType.MUL)){
             //"*"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.mul_i,-1));
@@ -68,7 +68,7 @@ public class Operation{
             else
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
         }
-        else if(t==TokenType.DIV){
+        else if(t.equals(TokenType.DIV)){
             //"/"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.div_i,-1));
@@ -77,7 +77,7 @@ public class Operation{
             else
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
         }
-        else if(t==TokenType.EQ){
+        else if(t.equals(TokenType.EQ)){
             //"=="
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
@@ -87,7 +87,7 @@ public class Operation{
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.br_false,-1));
         }
-        else if(t==TokenType.NEQ){
+        else if(t.equals(TokenType.NEQ)){
             //"!="
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
@@ -97,7 +97,7 @@ public class Operation{
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.br_true,-1));
         }
-        else if(t==TokenType.LT){
+        else if(t.equals(TokenType.LT)){
             //"<"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
@@ -108,7 +108,7 @@ public class Operation{
             instructions.add(new Instruction(OperationType.set_lt,-1));
             instructions.add(new Instruction(OperationType.br_true,-1));
         }
-        else if(t==TokenType.LT){
+        else if(t.equals(TokenType.LT)){
             //">"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
@@ -119,7 +119,7 @@ public class Operation{
             instructions.add(new Instruction(OperationType.set_gt,-1));
             instructions.add(new Instruction(OperationType.br_true,-1));
         }
-        else if(t==TokenType.GE){
+        else if(t.equals(TokenType.GE)){
             //">="
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
@@ -130,7 +130,7 @@ public class Operation{
             instructions.add(new Instruction(OperationType.set_lt,-1));
             instructions.add(new Instruction(OperationType.br_false,-1));
         }
-        else if(t==TokenType.LE){
+        else if(t.equals(TokenType.LE)){
             //"<="
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
