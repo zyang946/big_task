@@ -570,8 +570,8 @@ public final class Analyser {
      */
     private String analyseExpr() throws CompileError{
         String type = "";
-        Token test = peek();
-        System.out.println(test.getTokenType());
+        //Token test = peek();
+        //System.out.println(test.getTokenType());
         if(check(TokenType.MINUS))
             type = analyseNegate_expr();
         else if(check(TokenType.IDENT)){
@@ -579,12 +579,12 @@ public final class Analyser {
             String name = (String) token.getValue();
             SymbolEntry symbol = symbolTable.get(name);
             SymbolEntry library = libraryTable.get(name);
-            System.out.println(name);
+            //System.out.println(name);
             if(library!=null){
                 library.setFloor(floor);
                 library.setLocalId(-1);
                 library.setGlobalId(-1);
-                System.out.println("1");
+                //System.out.println("1");
             }
             if(symbol == null&& library==null)
                     throw new AnalyzeError(ErrorCode.NotDeclared,null);
@@ -745,10 +745,10 @@ public final class Analyser {
         HashMap<String,SymbolEntry> params = symbol.getParams();
         int paramNum =params.size();
         String type = analyseExpr();
-        System.out.println(type);
+        //System.out.println(type);
         while(!op.empty()&&op.peek()!=TokenType.L_PAREN)
             Operation.OperationInstruction(op.pop(),instructions,type);
-        System.out.println(params.get(num+"").getType());
+        //System.out.println(params.get(num+"").getType());
         if(!type.equals(params.get(num+"").getType())){
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         }
@@ -775,7 +775,7 @@ public final class Analyser {
         expect(TokenType.L_PAREN);
         op.push(TokenType.L_PAREN);
         String type = analyseExpr();
-        System.out.println(type);
+        //System.out.println(type);
         expect(TokenType.R_PAREN);
 
         while(op.peek().equals(TokenType.L_PAREN))

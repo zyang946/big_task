@@ -18,6 +18,7 @@ public class App {
             MiniVm out = new MiniVm(analyser.getGlobalTable(), analyser.getFunctionTable(), analyser.get_start());
             List<Byte> bytes = out.getOutput();
             byte[] result = new byte[bytes.size()];
+            System.out.println("============编译后============");
             for (int i = 0; i < bytes.size(); ++i) {
                 result[i] = bytes.get(i);
                 System.out.println(bytes.get(i));

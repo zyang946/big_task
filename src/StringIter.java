@@ -40,9 +40,13 @@ public class StringIter {
         if (initialized) {
             return;
         }
+        System.out.println("============编译前============");
         while (scanner.hasNext()) {
-            linesBuffer.add(scanner.nextLine() + '\n');
+            String str = scanner.nextLine();
+            linesBuffer.add(str + '\n');
+            System.out.println(str);
         }
+        System.out.println("============编译中============");
         // todo:check read \n?
         initialized = true;
     }
