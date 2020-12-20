@@ -670,10 +670,11 @@ public final class Analyser {
             instructions.add(new Instruction(OperationType.push,changeDouble(token.getValue())));
         }
         else{
-            type = "int";
+            type = "String";
             Token token = next();
             globalTable.put((String)token.getValue(),new GlobalEntry(true,((String)token.getValue()).length()));
             instructions.add(new Instruction(OperationType.push,(long) globalNum));
+            globalNum++;
         }
         return type;
     }
@@ -715,7 +716,7 @@ public final class Analyser {
         if(library!=null){
             globalTable.put(name,new GlobalEntry(true, name.length()));
             instruction = new Instruction(OperationType.callname,globalNum);
-            globalNum++;
+            //globalNum++
             type = library.returnType;
         }
         else{
@@ -741,7 +742,9 @@ public final class Analyser {
         }
         expect(TokenType.R_PAREN);
         op.pop();
+        instruction.setX(globalNum);
         instructions.add(instruction);
+        globalNum++;
         return type;
     }
     /**

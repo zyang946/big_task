@@ -64,4 +64,11 @@ public class Instruction {
     public void setX(long x) {
         this.x = x;
     }
+    @Override
+    public String toString(){
+        if(this.x != -1)
+            return "[" + this.opt + this.getX() + "]\n";
+        else
+        return "[" + this.opt + "]\n";
+    }
 }

@@ -69,4 +69,16 @@ public class FunctionEntry {
     public void setinnerInstructions(ArrayList<Instruction> innerInstructions) {
     	this.innerInstructions = innerInstructions;
     }
+
+    @Override
+    public String toString(){
+        return "Function{" +
+        "id=" + this.id +
+        ", \nlocSlots=" + this.locSlots +
+        ", \nparamSlots=" + this.paramSlots +
+        ", \nbody=" + this.innerInstructions +
+        ", \nretSlots=" + this.retSlots +
+        ", \nreturnType=" + this.returnType +
+        '}';
+    }
 }
