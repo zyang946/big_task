@@ -67,6 +67,27 @@ public class SymbolEntry {
     public void setParams(HashMap<String,SymbolEntry> params) {
     	this.params = params;
     }
+    //参数返回位置，不是参数为-1
+    int paramId;
+
+    public int getParamId() {
+        return this.paramId;
+    }
+    public void setParamId(int paramId) {
+        this.paramId = paramId;
+    }
+
+    //参数的函数名字
+    String functionName;
+
+    public String getFunctionName() {
+    	return this.functionName;
+    }
+    public void setFunctionName(String functionName) {
+    	this.functionName = functionName;
+    }
+
+
 
     //参数返回类型
     String returnType;
@@ -106,7 +127,7 @@ public class SymbolEntry {
     
 
 
-    public SymbolEntry(boolean isConstant,String type,boolean isInitialized,int stackOffset,boolean isFuction,HashMap<String,SymbolEntry> params,String returnType,int floor,int globalId,int localId){
+    public SymbolEntry(boolean isConstant,String type,boolean isInitialized,int stackOffset,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId){
         this.isConstant = isConstant;
         this.type = type;
         this.isInitialized = isInitialized;
@@ -117,6 +138,8 @@ public class SymbolEntry {
         this.floor = floor;
         this.localId = localId;
         this.globalId = globalId;
+        this.paramId = paramId;
+        this.functionName = functionName;
     }
     public SymbolEntry(boolean isConstant,String type,boolean isInitialized,int stackOffset,boolean isFuction,HashMap<String,SymbolEntry> params,String returnType){
         this.isConstant = isConstant;

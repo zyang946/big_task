@@ -37,7 +37,7 @@ public class App {
             byte[] result = new byte[bytes.size()];
             for (int i = 0; i < bytes.size(); ++i) {
                 result[i] = bytes.get(i);
-                System.out.println(bytes.get(i));
+                // System.out.println(bytes.get(i));
             }
 
             DataOutputStream output = new DataOutputStream(new FileOutputStream(new File(args[1])));

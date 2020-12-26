@@ -29,6 +29,7 @@ public class FunctionEntry {
     public FunctionEntry(int id,int retSlots,int paramSloct,int locSlots,String returnString, ArrayList<Instruction> innerInstructions){
         this.id = id;
         this.retSlots = retSlots;
+        this.paramSlots = paramSloct;
         this.locSlots = locSlots;
         this.returnType = returnString;
         this.innerInstructions = innerInstructions;

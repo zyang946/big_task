@@ -139,11 +139,11 @@ public final class Analyser {
      * @param curPos        当前 token 的位置（报错用）
      * @throws AnalyzeError 如果重复定义了则抛异常
      */
-    private void addSymbol(String name, Pos curPos,boolean isConstant,String type,boolean isInitialized,boolean isFuction,HashMap<String,SymbolEntry> params,String returnType,int floor,int globalId,int localId) throws AnalyzeError {
+    private void addSymbol(String name, Pos curPos,boolean isConstant,String type,boolean isInitialized,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId) throws AnalyzeError {
         if (this.symbolTable.get(name) != null&&this.symbolTable.get(name).getFloor()<floor) {
             throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
         } else {
-            this.symbolTable.put(name, new SymbolEntry(isConstant, type,isInitialized, getNextVariableOffset(),isFuction,params,returnType,floor,globalId,localId));
+            this.symbolTable.put(name, new SymbolEntry(isConstant, type,isInitialized, getNextVariableOffset(),isFuction,params,paramId,functionName,returnType,floor,globalId,localId));
         }
     }
 
@@ -243,7 +243,7 @@ public final class Analyser {
         expect(TokenType.L_PAREN);
         String name = (String) token.getValue();
         String returnType="";
-        addSymbol(name, token.getStartPos(), false, "void", true, true, params, returnType, floor, globalNum, -1);
+        addSymbol(name, token.getStartPos(), false, "void", true, true, params, -1,null,returnType, floor, globalNum, -1);
         SymbolEntry symbol = symbolTable.get(name);
         if(!check(TokenType.R_PAREN))
             params = analyseFunction_param_list(name,symbol);
@@ -257,6 +257,7 @@ public final class Analyser {
         int retSlots=0;
         if(returnType.equals("int")) retSlots=1;
         if(returnType.equals("double")) retSlots =2;
+//        System.out.println(name+params.size());
         FunctionEntry function = new FunctionEntry(globalNum, retSlots, params.size(), localNum, returnType,instructions);
         FunctionTable.put(name, function);
         analyseBlock_stmt();
@@ -280,12 +281,12 @@ public final class Analyser {
      */
     public HashMap<String,SymbolEntry> analyseFunction_param_list(String name,SymbolEntry symbol) throws CompileError{
         HashMap<String,SymbolEntry> params = new HashMap<>();
-        int i=1;
-        params.put(i+"",analyseFunction_param(i));
+        int i=0;
+        params.put(i+"",analyseFunction_param(name,i));
         while(check(TokenType.COMMA)){
             expect(TokenType.COMMA);
             i++;
-            params.put(i+"",analyseFunction_param(i));
+            params.put(i+"",analyseFunction_param(name,i));
         }
         return params;
     }
@@ -295,7 +296,7 @@ public final class Analyser {
      * @return
      * @throws CompileError
      */
-    public SymbolEntry analyseFunction_param(int i) throws CompileError{
+    public SymbolEntry analyseFunction_param(String name,int i) throws CompileError{
         SymbolEntry symbol = new SymbolEntry();
         boolean isConstant =false;
         if(check(TokenType.CONST_KW)){
@@ -306,8 +307,7 @@ public final class Analyser {
         expect(TokenType.COLON);
         Token type = expect(TokenType.ty);
         symbol.setType((String)type.getValue());
-        addSymbol((String) token.getValue(),token.getStartPos(), isConstant, (String)type.getValue(), false, false, null, null, floor+1, -1, -1);
-        localNum++;
+        addSymbol((String) token.getValue(),token.getStartPos(), isConstant, (String)type.getValue(), false, false, null, i,name,null, floor+1, -1, -1);
         return symbol; 
     }
     /**
@@ -416,9 +416,9 @@ public final class Analyser {
         if(check(TokenType.ASSIGN)){
             isInitialized = true;
             if(floor==1)
-                instructions.add(new Instruction(OperationType.globa,-1));
+                instructions.add(new Instruction(OperationType.globa,globalNum));
             else
-                instructions.add(new Instruction(OperationType.loca,-1));
+                instructions.add(new Instruction(OperationType.loca,localNum));
             expect(TokenType.ASSIGN);
             String newtype = analyseExpr();
             //System.out.println(newtype);
@@ -429,7 +429,7 @@ public final class Analyser {
             instructions.add(new Instruction(OperationType.store_64,-1));
         }
         expect(TokenType.SEMICOLON);
-        addSymbol(name,token.getStartPos(),false,type,isInitialized,false,null,null,floor,globalNum,localNum);
+        addSymbol(name,token.getStartPos(),false,type,isInitialized,false,null,-1,null,null,floor,globalNum,localNum);
         if(floor==1){
             globalNum++;
             globalTable.add(new GlobalEntry(false,0,name));
@@ -464,7 +464,7 @@ public final class Analyser {
             instructions.add(new Instruction(OperationType.store_64,-1));
         }
         expect(TokenType.SEMICOLON);
-        addSymbol(name,token.getStartPos(),true,type,isInitialized,false,null,null,floor,globalNum,localNum);
+        addSymbol(name,token.getStartPos(),true,type,isInitialized,false,null,-1,null,null,floor,globalNum,localNum);
         if(floor==1)
             globalNum++;
         else
@@ -480,8 +480,11 @@ public final class Analyser {
     public void analyseIf_stmt() throws CompileError{
         expect(TokenType.IF_KW);
         String type = analyseExpr();
-        if(!op.empty())
+        System.out.println(op.peek());
+        while(!op.empty()){
             Operation.OperationInstruction(op.pop(), instructions, type);
+        }
+
         if(!type.equals("int")&&!type.equals("double"))
             throw new AnalyzeError(ErrorCode.Break, peekedToken.getStartPos());
         instructions.add(new Instruction(OperationType.br_true,1));
@@ -535,7 +538,7 @@ public final class Analyser {
         instructions.add(new Instruction(OperationType.br,0));
         int i = instructions.size();
         String type = analyseExpr();
-        if(!op.empty())
+        while(!op.empty())
             Operation.OperationInstruction(op.pop(), instructions, type);
         if(!type.equals("int")&&!type.equals("double"))
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
@@ -628,7 +631,7 @@ public final class Analyser {
         type = analyseExpr();
         if(!type.equals("int") && !type.equals("double"))
             throw new AnalyzeError(ErrorCode.NotType, peekedToken.getStartPos());
-        if(!op.empty()){
+        while(!op.empty()){
             if(Operation.getPriority(op.peek(),TokenType.NEG)){
                 Operation.OperationInstruction(op.pop(),instructions,type);
             }
@@ -700,6 +703,18 @@ public final class Analyser {
      * @throws CompileError
      */
     public String analyseIdent_expr(SymbolEntry symbol) throws CompileError{
+        if(symbol.paramId!=-1){
+            String type = symbolTable.get(symbol.getFunctionName()).getType();
+            if(type.equals("void"))
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
+            else
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()+1));
+        }
+        else if(symbol.floor !=1)
+            instructions.add(new Instruction(OperationType.loca,symbol.getLocalId()));
+        else
+            instructions.add(new Instruction(OperationType.globa,symbol.getGlobalId()));
+        instructions.add(new Instruction(OperationType.load_64,-1));
         return symbol.getType();
     }
     /**
@@ -829,12 +844,13 @@ public final class Analyser {
     public String analyseOperator_expr(String type) throws CompileError {
         Token token = next();
         String newtype = analyseExpr();
-        if(!op.empty()){
+        while(!op.empty()){
             if(Operation.getPriority(op.peek(),token.getTokenType())){
                 Operation.OperationInstruction(op.pop(), instructions, type);
             }
         }
         op.push(token.getTokenType());
+        System.out.println(token.getTokenType());
         if(newtype.equals(type)&&(newtype.equals("int")||newtype.equals("double")))
             return newtype;
         else 

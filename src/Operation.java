@@ -85,7 +85,6 @@ public class Operation{
                 instructions.add(new Instruction(OperationType.cmp_f,-1));
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
-            instructions.add(new Instruction(OperationType.br_false,-1));
         }
         else if(t.equals(TokenType.NEQ)){
             //"!="
@@ -95,7 +94,6 @@ public class Operation{
                 instructions.add(new Instruction(OperationType.cmp_f,-1));
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
-            instructions.add(new Instruction(OperationType.br_true,-1));
         }
         else if(t.equals(TokenType.LT)){
             //"<"
@@ -106,9 +104,8 @@ public class Operation{
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.set_lt,-1));
-            instructions.add(new Instruction(OperationType.br_true,-1));
         }
-        else if(t.equals(TokenType.LT)){
+        else if(t.equals(TokenType.GT)){
             //">"
             if(type.equals("int"))
                 instructions.add(new Instruction(OperationType.cmp_i,-1));
@@ -117,7 +114,6 @@ public class Operation{
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.set_gt,-1));
-            instructions.add(new Instruction(OperationType.br_true,-1));
         }
         else if(t.equals(TokenType.GE)){
             //">="
@@ -128,7 +124,6 @@ public class Operation{
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.set_lt,-1));
-            instructions.add(new Instruction(OperationType.br_false,-1));
         }
         else if(t.equals(TokenType.LE)){
             //"<="
@@ -139,7 +134,6 @@ public class Operation{
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.set_gt,-1));
-            instructions.add(new Instruction(OperationType.br_false,-1));
         }
 
     }

@@ -1,4 +1,10 @@
+fn gcd(a: int, b: int) -> void {
+    if a > b {
+        let temp: int = a;
+        a = b;
+        b = temp;
+    }
+}
+
 fn main() -> void {
-    putstr("Hello, world!");
-    putln();
 }
