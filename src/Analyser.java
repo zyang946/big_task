@@ -672,7 +672,9 @@ public final class Analyser {
         else{
             type = "String";
             Token token = next();
-            globalTable.put((String)token.getValue(),new GlobalEntry(true,((String)token.getValue()).length()-2));
+            String str = (String)token.getValue();
+            int len = str.length();
+            globalTable.put(str.substring(1, len-1),new GlobalEntry(true,str.length()-2));
             instructions.add(new Instruction(OperationType.push,(long) globalNum));
             globalNum++;
         }
