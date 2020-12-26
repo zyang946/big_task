@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -11,13 +12,13 @@ import java.util.Map;
 public class MiniVm {
     FunctionEntry _start;
     ArrayList<Byte> output;
-    LinkedHashMap<String,GlobalEntry> globalTable;
+    ArrayList<GlobalEntry> globalTable;
     LinkedHashMap<String,FunctionEntry> functionTable;
     HashMap<OperationType,Integer> operationTable = Operation.getOperations();
     int magic = 0x72303b3e;
     int version = 0x00000001;
 
-    public MiniVm(LinkedHashMap<String,GlobalEntry> globalTable,LinkedHashMap<String,FunctionEntry> functionTable,FunctionEntry _start){
+    public MiniVm(ArrayList<GlobalEntry> globalTable,LinkedHashMap<String,FunctionEntry> functionTable,FunctionEntry _start){
        this.globalTable = globalTable;
        this.functionTable = functionTable;
        this._start = _start;
@@ -27,16 +28,16 @@ public class MiniVm {
         output_add(magic,4);
         output_add(version,4);
         output_add(globalTable.size(),4);
-        for (Iterator<Map.Entry<String, GlobalEntry>> it = globalTable.entrySet().iterator(); it.hasNext();){
-            Map.Entry<String, GlobalEntry> item = it.next();
-            output_add(booleanToint(item.getValue().getIsConst()), 1);
-            if(item.getValue().getLength()==0){
+        for(Iterator<GlobalEntry> it = globalTable.iterator();it.hasNext();){
+            GlobalEntry item = it.next();
+            output_add(booleanToint(item.getIsConst()), 1);
+            if(item.getLength()==0){
                 output_add(8,4);
                 output_add(0L,8);
             }
             else{
-                output_add(item.getValue().getLength(), 4);
-                output_add(item.getKey());
+                output_add(item.getLength(), 4);
+                output_add(item.getItem());
             }
         }
         output_add(functionTable.size()+1, 4);

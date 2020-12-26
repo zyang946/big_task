@@ -18,8 +18,8 @@ public final class Analyser {
 
     /** 符号表 */
     HashMap<String, SymbolEntry> symbolTable = new HashMap<>();
-    //全局变量表
-    LinkedHashMap<String, GlobalEntry> globalTable = new LinkedHashMap<>();
+    //全局变量表，因为会用重复的元素在，所以只能用链表
+    ArrayList<GlobalEntry> globalTable = new ArrayList<>();
     //函数表
     LinkedHashMap<String, FunctionEntry> FunctionTable = new LinkedHashMap<>();
     //标准库表
@@ -217,7 +217,7 @@ public final class Analyser {
         FunctionEntry mainFunction = FunctionTable.get("main");
         if(mainFunction==null)
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
-        globalTable.put("_start",new GlobalEntry(true, 6));
+        globalTable.add(new GlobalEntry(true, 6,"_start"));
         SymbolEntry mainSymbol = symbolTable.get("main");
         if(mainSymbol.getReturnType().equals("void")){
             initInstructions.add(new Instruction(OperationType.stackalloc,0));
@@ -269,7 +269,7 @@ public final class Analyser {
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         }
 
-        globalTable.put(name,new GlobalEntry(true,name.length()));
+        globalTable.add(new GlobalEntry(true,name.length(),name));
         globalNum++;
     }
     /**
@@ -432,7 +432,7 @@ public final class Analyser {
         addSymbol(name,token.getStartPos(),false,type,isInitialized,false,null,null,floor,globalNum,localNum);
         if(floor==1){
             globalNum++;
-            globalTable.put(name,new GlobalEntry(false));
+            globalTable.add(new GlobalEntry(false,0,name));
         }
         else
             localNum++;  
@@ -672,9 +672,7 @@ public final class Analyser {
         else{
             type = "String";
             Token token = next();
-            String str = (String)token.getValue();
-            int len = str.length();
-            globalTable.put(str.substring(1, len-1),new GlobalEntry(true,str.length()-2));
+            globalTable.add(new GlobalEntry(true,((String)token.getValue()).length(),(String)token.getValue()));
             instructions.add(new Instruction(OperationType.push,(long) globalNum));
             globalNum++;
         }
@@ -745,8 +743,10 @@ public final class Analyser {
         op.pop();
         instruction.setX(globalNum);
         instructions.add(instruction);
-        globalTable.put(name,new GlobalEntry(true, name.length()));
-        globalNum++;
+        if(library!=null){
+            globalTable.add(new GlobalEntry(true, name.length(),name));
+            globalNum++;
+        }
         return type;
     }
     /**
@@ -845,7 +845,7 @@ public final class Analyser {
     public void set_start(FunctionEntry _start) {
     	this._start = _start;
     }
-    public LinkedHashMap<String,GlobalEntry> getGlobalTable() {
+    public ArrayList<GlobalEntry> getGlobalTable() {
     	return this.globalTable;
     }
     public LinkedHashMap<String,FunctionEntry> getFunctionTable() {

@@ -20,9 +20,9 @@ public class App {
             System.out.println("============DEBUGGING============");
             System.out.println("全局符号表大小："+analyser.getGlobalTable().size());
             System.out.println("全局符号表：");
-            for (Iterator<Map.Entry<String, GlobalEntry>> item = analyser.getGlobalTable().entrySet().iterator(); item.hasNext();){
-                Map.Entry<String, GlobalEntry> tmpitem = item.next();
-                System.out.println(tmpitem.getKey() +"->" + tmpitem.getValue());
+            for(Iterator<GlobalEntry> item = analyser.getGlobalTable().iterator();item.hasNext();){
+                GlobalEntry tmpitem = item.next();
+                System.out.println(tmpitem.toString());
             }
             System.out.println("起始函数：\n"+analyser.get_start());
             System.out.println("函数：");
