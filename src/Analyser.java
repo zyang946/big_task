@@ -413,6 +413,8 @@ public final class Analyser {
         expect(TokenType.COLON);
         Token typetoken = expect(TokenType.ty);
         String type = (String)typetoken.getValue();
+        if(type.equals("void"))
+            throw new AnalyzeError(ErrorCode.Break, token.getStartPos());
         if(check(TokenType.ASSIGN)){
             isInitialized = true;
             if(floor==1)
