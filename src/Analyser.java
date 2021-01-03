@@ -649,6 +649,8 @@ public final class Analyser {
      */
     public String analyseAssign_expr(SymbolEntry symbol) throws CompileError {
         String type = "";
+        if(symbol.isConstant)
+            throw new AnalyzeError(ErrorCode.AssignToConstant, peekedToken.getStartPos());
         expect(TokenType.ASSIGN);
         type = analyseExpr();
         if(!symbol.getType().equals(type))
