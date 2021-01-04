@@ -85,6 +85,7 @@ public class Operation{
                 instructions.add(new Instruction(OperationType.cmp_f,-1));
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
+            instructions.add(new Instruction(OperationType.not,-1));
         }
         else if(t.equals(TokenType.NEQ)){
             //"!="
@@ -124,6 +125,7 @@ public class Operation{
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.set_lt,-1));
+            instructions.add(new Instruction(OperationType.not,-1));
         }
         else if(t.equals(TokenType.LE)){
             //"<="
@@ -134,6 +136,7 @@ public class Operation{
             else 
                 throw new AnalyzeError(ErrorCode.InvalidInput,null);
             instructions.add(new Instruction(OperationType.set_gt,-1));
+            instructions.add(new Instruction(OperationType.not,-1));
         }
 
     }

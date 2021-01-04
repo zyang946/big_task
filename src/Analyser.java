@@ -254,13 +254,11 @@ public final class Analyser {
         Token type = expect(TokenType.ty);
         returnType =  (String) type.getValue();
         symbol.setParams(params);
-        //System.out.println(returnType);
         symbol.setReturnType(returnType);
         runningFunction = symbol;
         int retSlots=0;
         if(returnType.equals("int")) retSlots=1;
-        if(returnType.equals("double")) retSlots =2;
-//        System.out.println(name+params.size());
+        if(returnType.equals("double")) retSlots =1;
         FunctionEntry function = new FunctionEntry(globalNum, retSlots, params.size(), localNum, returnType,instructions);
         FunctionTable.put(name, function);
         analyseBlock_stmt();
@@ -658,6 +656,17 @@ public final class Analyser {
         String type = "";
         if(symbol.isConstant)
             throw new AnalyzeError(ErrorCode.AssignToConstant, peekedToken.getStartPos());
+        if(symbol.paramId!=-1){
+            String returnType = symbolTable.get(symbol.getFunctionName()).getReturnType();
+            if(returnType.equals("void"))
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
+            else
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()+1));
+        }
+        else if(symbol.floor !=1)
+            instructions.add(new Instruction(OperationType.loca,symbol.getLocalId()));
+        else
+            instructions.add(new Instruction(OperationType.globa,symbol.getGlobalId()));        
         expect(TokenType.ASSIGN);
         type = analyseExpr();
         if(!symbol.getType().equals(type))
@@ -714,8 +723,9 @@ public final class Analyser {
      * @throws CompileError
      */
     public String analyseIdent_expr(SymbolEntry symbol) throws CompileError{
+        //System.out.println(symbol.getParamId());
         if(symbol.paramId!=-1){
-            String type = symbolTable.get(symbol.getFunctionName()).getType();
+            String type = symbolTable.get(symbol.getFunctionName()).getReturnType();
             if(type.equals("void"))
                 instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
             else

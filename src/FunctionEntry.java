@@ -70,7 +70,6 @@ public class FunctionEntry {
     public void setinnerInstructions(ArrayList<Instruction> innerInstructions) {
     	this.innerInstructions = innerInstructions;
     }
-
     @Override
     public String toString(){
         return "Function{" +
