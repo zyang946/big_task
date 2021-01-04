@@ -140,7 +140,9 @@ public final class Analyser {
      * @throws AnalyzeError 如果重复定义了则抛异常
      */
     private void addSymbol(String name, Pos curPos,boolean isConstant,String type,boolean isInitialized,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId) throws AnalyzeError {
-        if (this.symbolTable.get(name) != null&&this.symbolTable.get(name).getFloor()<floor) {
+        // SymbolEntry s = symbolTable.get(name);
+        // System.out.println(s.getFloor());
+        if (this.symbolTable.get(name) != null&&this.symbolTable.get(name).getFloor()<=floor) {
             throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
         } else {
             this.symbolTable.put(name, new SymbolEntry(isConstant, type,isInitialized, getNextVariableOffset(),isFuction,params,paramId,functionName,returnType,floor,globalId,localId));
@@ -252,6 +254,7 @@ public final class Analyser {
         Token type = expect(TokenType.ty);
         returnType =  (String) type.getValue();
         symbol.setParams(params);
+        //System.out.println(returnType);
         symbol.setReturnType(returnType);
         runningFunction = symbol;
         int retSlots=0;
@@ -385,7 +388,9 @@ public final class Analyser {
      */
     public void analyseReturn_stmt() throws CompileError{
         expect(TokenType.RETURN_KW);
+        int flag =0;
         if(!check(TokenType.SEMICOLON)){
+            flag = 1;
             if(!runningFunction.getReturnType().equals("void")){
                 instructions.add(new Instruction(OperationType.arga,0));
                 String type = analyseExpr();
@@ -398,6 +403,8 @@ public final class Analyser {
             }
         }
         expect(TokenType.SEMICOLON);
+        if((flag==0&&runningFunction.getReturnType().equals("int"))||(flag==1&&runningFunction.getReturnType().equals("void")))
+            throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         instructions.add(new Instruction(OperationType.ret,-1));
         returnFunction = runningFunction;
     }
