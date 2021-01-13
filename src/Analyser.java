@@ -510,7 +510,7 @@ public final class Analyser {
                     analyseIf_stmt();
                 else if(check(TokenType.L_BRACE)){
                     analyseBlock_stmt();
-                    if(!instructions.get(instructions.size()).getOpt().equals(OperationType.ret))
+                    if(!instructions.get(instructions.size()-1).getOpt().equals(OperationType.ret))
                         instructions.add(new Instruction(OperationType.br,0));
                 }
                 else 
