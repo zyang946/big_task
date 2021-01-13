@@ -669,6 +669,8 @@ public final class Analyser {
             instructions.add(new Instruction(OperationType.globa,symbol.getGlobalId()));        
         expect(TokenType.ASSIGN);
         type = analyseExpr();
+        while(!op.empty())
+            Operation.OperationInstruction(op.pop(), instructions, type);
         if(!symbol.getType().equals(type))
             throw new AnalyzeError(ErrorCode.NotType,null);
         instructions.add(new Instruction(OperationType.store_64,-1));

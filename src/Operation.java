@@ -53,7 +53,7 @@ public class Operation{
         else if(t.equals(TokenType.MINUS)){
             //"- minus"
             if(type.equals("int"))
-                instructions.add(new Instruction(OperationType.sub_i));
+                instructions.add(new Instruction(OperationType.sub_i,-1));
             else if(type.equals("double"))
                 instructions.add(new Instruction(OperationType.sub_f,-1));
             else
