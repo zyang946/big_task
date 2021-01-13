@@ -639,9 +639,10 @@ public final class Analyser {
         if(!type.equals("int") && !type.equals("double"))
             throw new AnalyzeError(ErrorCode.NotType, peekedToken.getStartPos());
         while(!op.empty()){
-            if(Operation.getPriority(op.peek(),TokenType.NEG)){
+            int in = Operation.getOrder(op.peek());
+            int out = Operation.getOrder(TokenType.NEG);
+            if (Operation.priority[in][out] > 0)
                 Operation.OperationInstruction(op.pop(),instructions,type);
-            }
         }
         return type;
     }
@@ -866,13 +867,16 @@ public final class Analyser {
      */
     public String analyseOperator_expr(String type) throws CompileError {
         Token token = next();
-        String newtype = analyseExpr();
         while(!op.empty()){
-            if(Operation.getPriority(op.peek(),token.getTokenType())){
+            int in = Operation.getOrder(op.peek());
+            int out = Operation.getOrder(token.getTokenType());
+            System.out.println(Operation.priority[in][out]);
+            if (Operation.priority[in][out] > 0){
                 Operation.OperationInstruction(op.pop(), instructions, type);
             }
         }
         op.push(token.getTokenType());
+        String newtype = analyseExpr();
         System.out.println(token.getTokenType());
         if(newtype.equals(type)&&(newtype.equals("int")||newtype.equals("double")))
             return newtype;

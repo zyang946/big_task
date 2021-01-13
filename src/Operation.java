@@ -5,32 +5,70 @@ import java.util.HashMap;
 
 public class Operation{
 
-    public static boolean getPriority(TokenType t1,TokenType t2) throws CompileError{
-        int o1 = getOrder(t1);
-        int o2 = getOrder(t2);
-        if(o1<o2)
-            return true;
-        return false;
-    }
-    public static int getOrder(TokenType t){
-        if(t.equals(TokenType.L_PAREN))
+    public static int priority[][]={
+        {1,1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {1,1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {1,1,1,1,-1,1,1,1,1,1,1,1,-1,-1},
+        {1,1,1,1,-1,1,1,1,1,1,1,1,-1,-1},
+        {-1,-1,-1,-1,-1,100,-1,-1,-1,-1,-1,-1,-1,-1},
+        {-1,-1,-1,-1,0,0,-1,-1,-1,-1,-1,-1,-1,-1},
+        {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
+        {1,1,1,1,-1,1,1,1,1,1,1,1,-1,-1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+    };
+
+    public static int getOrder(TokenType tokenType){
+        if(tokenType == TokenType.PLUS){
+            return 0;
+        }
+        else if(tokenType == TokenType.MINUS){
             return 1;
-        else if(t.equals(TokenType.NEG))
+        }
+        else if(tokenType == TokenType.MUL){
             return 2;
-        else if(t.equals(TokenType.AS))
+        }
+        else if(tokenType == TokenType.DIV){
             return 3;
-        else if(t.equals(TokenType.MINUS)||t.equals(TokenType.DIV))
+        }
+        else if(tokenType == TokenType.L_PAREN){
             return 4;
-        else if(t.equals(TokenType.PLUS)||t.equals(TokenType.MINUS))
+        }
+        else if(tokenType == TokenType.R_PAREN){
             return 5;
-        else if(t.equals(TokenType.EQ)||t.equals(TokenType.NEQ)||t.equals(TokenType.LT)||t.equals(TokenType.GT)||t.equals(TokenType.LE)||t.equals(TokenType.GE))
+        }
+        else if(tokenType == TokenType.LT){
             return 6;
-        else if(t.equals(TokenType.ASSIGN))
+        }
+        else if(tokenType == TokenType.GT){
             return 7;
-        else if(t.equals(TokenType.L_PAREN))
+        }
+        else if(tokenType == TokenType.LE){
             return 8;
-        return 0;
+        }
+        else if(tokenType == TokenType.GE){
+            return 9;
+        }
+        else if(tokenType == TokenType.EQ){
+            return 10;
+        }
+        else if(tokenType == TokenType.NEQ){
+            return 11;
+        }
+        else if(tokenType == TokenType.NEG){
+            return 12;
+        }
+        return -1;
     }
+
+    public static int[][] getPriority() {
+        return priority;
+    }
+
     public static void OperationInstruction(TokenType t,ArrayList<Instruction> instructions,String type)throws CompileError{
         if(t.equals(TokenType.NEG)){
             //“- neg”
@@ -204,4 +242,5 @@ public class Operation{
         operations.put(OperationType.panic, 0xfe);
         return operations;
     }
+
 }
