@@ -763,6 +763,7 @@ public final class Analyser {
                 throw new AnalyzeError(ErrorCode.Break, token.getStartPos());
             }
             int id = FunctionTable.get(name).getId();
+            System.out.println("call"+id);
             instruction = new Instruction(OperationType.call,id+1);
             type = FunctionTable.get(name).getReturnType();
         }
@@ -781,7 +782,6 @@ public final class Analyser {
         }
         expect(TokenType.R_PAREN);
         op.pop();
-        instruction.setX(globalNum);
         instructions.add(instruction);
         if(library!=null){
             globalTable.add(new GlobalEntry(true, name.length(),name));
