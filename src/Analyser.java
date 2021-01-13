@@ -836,7 +836,7 @@ public final class Analyser {
         //System.out.println(type);
         expect(TokenType.R_PAREN);
 
-        while(op.peek().equals(TokenType.L_PAREN))
+        while(!op.peek().equals(TokenType.L_PAREN))
             Operation.OperationInstruction(op.pop(),instructions,type);
         op.pop();
         return type;
@@ -871,7 +871,7 @@ public final class Analyser {
      */
     public String analyseOperator_expr(String type) throws CompileError {
         Token token = next();
-        while(!op.empty()){
+        while(!op.empty()&&!op.peek().equals(TokenType.L_PAREN)){
             int in = Operation.getOrder(op.peek());
             int out = Operation.getOrder(token.getTokenType());
             System.out.println(Operation.priority[in][out]);
