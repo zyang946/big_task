@@ -142,7 +142,7 @@ public final class Analyser {
     private void addSymbol(String name, Pos curPos,boolean isConstant,String type,boolean isInitialized,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId) throws AnalyzeError {
         // SymbolEntry s = symbolTable.get(name);
         // System.out.println(s.getFloor());
-        if (this.symbolTable.get(name) != null&&this.symbolTable.get(name).getFloor()<=floor) {
+        if (this.symbolTable.get(name) != null&&this.symbolTable.get(name).getFloor()>=floor) {
             throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
         } else {
             this.symbolTable.put(name, new SymbolEntry(isConstant, type,isInitialized, getNextVariableOffset(),isFuction,params,paramId,functionName,returnType,floor,globalId,localId));
@@ -309,6 +309,7 @@ public final class Analyser {
         Token type = expect(TokenType.ty);
         symbol.setType((String)type.getValue());
         addSymbol((String) token.getValue(),token.getStartPos(), isConstant, (String)type.getValue(), false, false, null, i,name,null, floor+1, -1, -1);
+        System.out.println(floor+1);
         return symbol; 
     }
     /**
@@ -369,6 +370,7 @@ public final class Analyser {
     public void analyseBlock_stmt() throws CompileError{
         expect(TokenType.L_BRACE);
         floor++;
+        System.out.println(floor);
         while(!check(TokenType.R_BRACE))
             analyseStmt();
         expect(TokenType.R_BRACE);
@@ -783,11 +785,13 @@ public final class Analyser {
         }
         expect(TokenType.R_PAREN);
         op.pop();
-        instructions.add(instruction);
+
         if(library!=null){
             globalTable.add(new GlobalEntry(true, name.length(),name));
+            instruction.setX(globalNum);
             globalNum++;
         }
+        instructions.add(instruction);
         return type;
     }
     /**
