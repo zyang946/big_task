@@ -1,13 +1,13 @@
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 
 public class FunctionEntry {
     int id;//序号
 
+    int functionNum;//函数序列
     //如果返回值是int，则为1；是double，则为2；是void，则为0
     int retSlots;
 
@@ -26,7 +26,8 @@ public class FunctionEntry {
 
 
 
-    public FunctionEntry(int id,int retSlots,int paramSloct,int locSlots,String returnString, ArrayList<Instruction> innerInstructions){
+    public FunctionEntry(int functionNum,int id,int retSlots,int paramSloct,int locSlots,String returnString, ArrayList<Instruction> innerInstructions){
+        this.functionNum = functionNum;
         this.id = id;
         this.retSlots = retSlots;
         this.paramSlots = paramSloct;
@@ -39,6 +40,12 @@ public class FunctionEntry {
     }
     public void setId(int id) {
     	this.id = id;//序号
+    }
+    public int getFunctionNum() {
+    	return this.functionNum;
+    }
+    public void setFunctionNum(int functionNum) {
+    	this.functionNum = functionNum;
     }
     public int getRetSlots() {
     	return this.retSlots;
@@ -73,7 +80,8 @@ public class FunctionEntry {
     @Override
     public String toString(){
         return "Function{" +
-        "id=" + this.id +
+        "functionNum="+this.functionNum +
+        ",\nid=" + this.id +
         ", \nlocSlots=" + this.locSlots +
         ", \nparamSlots=" + this.paramSlots +
         ", \nbody=" + this.innerInstructions +

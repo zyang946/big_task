@@ -239,7 +239,7 @@ public final class Analyser {
             initInstructions.add(new Instruction(OperationType.call,functionNum-1));
             initInstructions.add(new Instruction(OperationType.popn,1));
         }
-        _start = new FunctionEntry(globalNum, 0, 0, 0, "void", initInstructions);
+        _start = new FunctionEntry(functionNum,globalNum, 0, 0, 0, "void", initInstructions);
         FunctionTable.put("_start", _start);
         globalNum++;
     }   
@@ -268,7 +268,7 @@ public final class Analyser {
         int retSlots=0;
         if(returnType.equals("int")) retSlots=1;
         if(returnType.equals("double")) retSlots =1;
-        FunctionEntry function = new FunctionEntry(globalNum, retSlots, params.size(), localNum, returnType,instructions);
+        FunctionEntry function = new FunctionEntry(functionNum,globalNum, retSlots, params.size(), localNum, returnType,instructions);
         FunctionTable.put(name, function);
         analyseBlock_stmt();
         function.setId(globalNum);
@@ -779,9 +779,9 @@ public final class Analyser {
             if(!symbol.getType().equals("void")){
                 throw new AnalyzeError(ErrorCode.Break, token.getStartPos());
             }
-            int id = FunctionTable.get(name).getId();
-            System.out.println("call"+id);
-            instruction = new Instruction(OperationType.call,id+1);
+            int id = FunctionTable.get(name).getFunctionNum();
+            System.out.println("call"+name+id);
+            instruction = new Instruction(OperationType.call,id);
             type = FunctionTable.get(name).getReturnType();
         }
         op.push(TokenType.L_PAREN);
