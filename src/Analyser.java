@@ -16,8 +16,8 @@ public final class Analyser {
     /** 当前偷看的 token */
     Token peekedToken = null;
 
-    /** 符号表 */
-    HashMap<String, SymbolEntry> symbolTable = new HashMap<>();
+    /** 符号表 因为会用重复的元素在，所以只能用链表*/
+    ArrayList<SymbolEntry> symbolTable = new ArrayList<>();
     //全局变量表，因为会用重复的元素在，所以只能用链表
     ArrayList<GlobalEntry> globalTable = new ArrayList<>();
     //函数表
@@ -130,6 +130,15 @@ public final class Analyser {
         return this.nextOffset++;
     }
 
+
+    private SymbolEntry find(String name){
+        for (int i = symbolTable.size() - 1; i >= 0; i--) {
+            SymbolEntry symbol = symbolTable.get(i); 
+            if(symbol.getName().equals(name))
+                return symbol;
+        }
+        return null;
+    }
     /**
      * 添加一个符号
      * 
@@ -142,10 +151,10 @@ public final class Analyser {
     private void addSymbol(String name, Pos curPos,boolean isConstant,String type,boolean isInitialized,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId) throws AnalyzeError {
         // SymbolEntry s = symbolTable.get(name);
         // System.out.println(s.getFloor());
-        if (this.symbolTable.get(name) != null&&this.symbolTable.get(name).getFloor()>=floor) {
+        if (find(name) != null&&find(name).getFloor()>=floor) {
             throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
         } else {
-            this.symbolTable.put(name, new SymbolEntry(isConstant, type,isInitialized, getNextVariableOffset(),isFuction,params,paramId,functionName,returnType,floor,globalId,localId));
+            this.symbolTable.add(new SymbolEntry(name, isConstant, type,isInitialized, getNextVariableOffset(),isFuction,params,paramId,functionName,returnType,floor,globalId,localId));
         }
     }
 
@@ -157,7 +166,7 @@ public final class Analyser {
      * @throws AnalyzeError 如果未定义则抛异常
      */
     private void initializeSymbol(String name, Pos curPos) throws AnalyzeError {
-        SymbolEntry entry = this.symbolTable.get(name);
+        SymbolEntry entry = find(name);
         if (entry == null) {
             throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
         } else {
@@ -174,7 +183,7 @@ public final class Analyser {
      * @throws AnalyzeError
      */
     private int getOffset(String name, Pos curPos) throws AnalyzeError {
-        SymbolEntry entry = this.symbolTable.get(name);
+        SymbolEntry entry = find(name);
         if (entry == null) {
             throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
         } else {
@@ -191,7 +200,7 @@ public final class Analyser {
      * @throws AnalyzeError
      */
     private boolean isConstant(String name, Pos curPos) throws AnalyzeError {
-        SymbolEntry entry = this.symbolTable.get(name);
+        SymbolEntry entry = find(name);
         if (entry == null) {
             throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
         } else {
@@ -220,7 +229,7 @@ public final class Analyser {
         if(mainFunction==null)
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         globalTable.add(new GlobalEntry(true, 6,"_start"));
-        SymbolEntry mainSymbol = symbolTable.get("main");
+        SymbolEntry mainSymbol = find("main");
         if(mainSymbol.getReturnType().equals("void")){
             initInstructions.add(new Instruction(OperationType.stackalloc,0));
             initInstructions.add(new Instruction(OperationType.call,functionNum-1));
@@ -246,7 +255,7 @@ public final class Analyser {
         String name = (String) token.getValue();
         String returnType="";
         addSymbol(name, token.getStartPos(), false, "void", true, true, params, -1,null,returnType, floor, globalNum, -1);
-        SymbolEntry symbol = symbolTable.get(name);
+        SymbolEntry symbol = find(name);
         if(!check(TokenType.R_PAREN))
             params = analyseFunction_param_list(name,symbol);
         expect(TokenType.R_PAREN);
@@ -374,12 +383,17 @@ public final class Analyser {
         while(!check(TokenType.R_BRACE))
             analyseStmt();
         expect(TokenType.R_BRACE);
-        for (Iterator<Map.Entry<String, SymbolEntry>> it = symbolTable.entrySet().iterator(); it.hasNext();){
-            Map.Entry<String, SymbolEntry> item = it.next();
-            //... to do with item
-            if(item.getValue().getFloor()==floor)
-                it.remove();
+        Iterator<SymbolEntry> sListIterator = symbolTable.iterator();
+        while(sListIterator.hasNext()){
+            SymbolEntry e = sListIterator.next();
+            if(e.getFloor()==floor){
+                sListIterator.remove();
+            }
         }
+        // for (SymbolEntry symbol : symbolTable){
+        //     if(symbol.getFloor()==floor)
+        //         symbolTable.remove(symbol);
+        // }
         floor--;
     }
     /**
@@ -589,7 +603,7 @@ public final class Analyser {
         else if(check(TokenType.IDENT)){
             Token token = next();
             String name = (String) token.getValue();
-            SymbolEntry symbol = symbolTable.get(name);
+            SymbolEntry symbol = find(name);
             SymbolEntry library = libraryTable.get(name);
             //System.out.println(name);
             if(library!=null){
@@ -660,7 +674,7 @@ public final class Analyser {
         if(symbol.isConstant)
             throw new AnalyzeError(ErrorCode.AssignToConstant, peekedToken.getStartPos());
         if(symbol.paramId!=-1){
-            String returnType = symbolTable.get(symbol.getFunctionName()).getReturnType();
+            String returnType = find(symbol.getFunctionName()).getReturnType();
             if(returnType.equals("void"))
                 instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
             else
@@ -730,7 +744,7 @@ public final class Analyser {
     public String analyseIdent_expr(SymbolEntry symbol) throws CompileError{
         //System.out.println(symbol.getParamId());
         if(symbol.paramId!=-1){
-            String type = symbolTable.get(symbol.getFunctionName()).getReturnType();
+            String type = find(symbol.getFunctionName()).getReturnType();
             if(type.equals("void"))
                 instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
             else

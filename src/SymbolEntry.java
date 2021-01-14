@@ -7,6 +7,14 @@ import java.util.List;
 public class SymbolEntry {
 
 
+
+    String name;
+    public String getName(){
+        return name;
+    }
+    public void setName(String name){
+        this.name = name;
+    }
     //是否是常数
     boolean isConstant;
 
@@ -127,7 +135,8 @@ public class SymbolEntry {
     
 
 
-    public SymbolEntry(boolean isConstant,String type,boolean isInitialized,int stackOffset,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId){
+    public SymbolEntry(String name,boolean isConstant,String type,boolean isInitialized,int stackOffset,boolean isFuction,HashMap<String,SymbolEntry> params,int paramId,String functionName,String returnType,int floor,int globalId,int localId){
+        this.name = name;
         this.isConstant = isConstant;
         this.type = type;
         this.isInitialized = isInitialized;
