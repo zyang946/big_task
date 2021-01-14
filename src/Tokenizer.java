@@ -177,15 +177,25 @@ public class Tokenizer {
                     return new Token(TokenType.ARROW,"->",startPos,it.currentPos());
                 }
                 else// 填入返回语句
-                    return new Token(TokenType.MINUS, '+', it.previousPos(), it.currentPos());
+                    return new Token(TokenType.MINUS, '-', it.previousPos(), it.currentPos());
 
             case '*':
                 // 填入返回语句
-                return new Token(TokenType.MUL, '+', it.previousPos(), it.currentPos());
+                return new Token(TokenType.MUL, '*', it.previousPos(), it.currentPos());
 
             case '/':
+            if(it.peekChar() == '/'){
+                it.nextChar();
+                char now = it.nextChar();
+                while(true){
+                    if(now == '\n') break;
+                    now = it.nextChar();
+                }
+                return nextToken();
+            }
+            else
                 // 填入返回语句
-                return new Token(TokenType.DIV, '+', it.previousPos(), it.currentPos());
+                return new Token(TokenType.DIV, '/', it.previousPos(), it.currentPos());
 
             // 填入更多状态和返回语句
             case '=':
@@ -196,7 +206,7 @@ public class Tokenizer {
                 }
             // 填入返回语句
                 else
-                    return new Token(TokenType.ASSIGN, '+', it.previousPos(), it.currentPos());
+                    return new Token(TokenType.ASSIGN, '=', it.previousPos(), it.currentPos());
             case '!':
                 if(it.peekChar()=='='){
                     Pos startPos = it.previousPos();
