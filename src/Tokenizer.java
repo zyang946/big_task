@@ -32,7 +32,7 @@ public class Tokenizer {
             return Ident();
         } else if(peek == '"'){
             return String_Literal();
-        } else if(peek == '\\'){
+        } else if(peek == '\''){
             return Char_Literal();
         } else {
             return OperatorOrUnknown();
@@ -117,7 +117,9 @@ public class Tokenizer {
         String value = "";
         value += it.nextChar();
         char peek = it.peekChar();
+        int flag = 70000;
         while(peek != '"'){
+            flag--;
             if(peek=='\\'){
                 it.nextChar();
                 switch(it.peekChar()){
@@ -154,16 +156,43 @@ public class Tokenizer {
                 value += it.nextChar();
             }
             peek = it.peekChar();
+            if(flag==0)
+                throw new TokenizeError(ErrorCode.Break,it.previousPos());
         }
         value += it.nextChar();
         Pos endPos = it.currentPos();
         return new Token(TokenType.STRING_LITERAL,value,startPos,endPos);
     }
     private Token Char_Literal() throws TokenizeError{
-        throw new Error("Not implemented");
-    }
-    private Token Comment() throws TokenizeError{
-        throw new Error("Not implemented");
+        it.nextChar();
+        char ch = it.nextChar();
+        if(ch=='\\'){
+            switch(it.nextChar()){
+                case '\'':
+                    it.nextChar();
+                    return new Token(TokenType.STRING_LITERAL,(long)'\'',it.previousPos(),it.currentPos());
+                case '"':
+                    it.nextChar();
+                    return new Token(TokenType.UINT_LITERAL,(long)'"',it.previousPos(),it.currentPos());
+                case '\\':
+                    it.nextChar();
+                    return new Token(TokenType.UINT_LITERAL,(long)'\\',it.previousPos(),it.currentPos());
+                case 'n':
+                    it.nextChar();
+                    return new Token(TokenType.UINT_LITERAL,(long)'\n',it.previousPos(),it.currentPos());
+                case 't':
+                    it.nextChar();
+                    return new Token(TokenType.UINT_LITERAL,(long)'\t',it.previousPos(),it.currentPos());
+                case 'r':
+                    it.nextChar();
+                    return new Token(TokenType.UINT_LITERAL,(long)'\r',it.previousPos(),it.currentPos());
+                default:
+                    // 不认识这个输入，摸了
+                    throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
+                }
+        }
+        it.nextChar();
+        return new Token(TokenType.UINT_LITERAL,(long)ch,it.previousPos(),it.currentPos());
     }
     private Token OperatorOrUnknown() throws TokenizeError {
         switch (it.nextChar()) {

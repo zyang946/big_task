@@ -18,48 +18,48 @@ public class Operation{
         {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
         {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
         {-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1},
-        {1,1,1,1,-1,1,1,1,1,1,1,1,-1,-1},
+        {1,1,1,1,-1,1,1,1,1,1,1,1,1,-1},
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     };
 
     public static int getOrder(TokenType tokenType){
-        if(tokenType == TokenType.PLUS){
+        if(tokenType.equals(TokenType.PLUS)) {
             return 0;
         }
-        else if(tokenType == TokenType.MINUS){
+        else if(tokenType.equals(TokenType.MINUS)){
             return 1;
         }
-        else if(tokenType == TokenType.MUL){
+        else if(tokenType.equals(TokenType.MUL)){
             return 2;
         }
-        else if(tokenType == TokenType.DIV){
+        else if(tokenType.equals(TokenType.DIV)){
             return 3;
         }
-        else if(tokenType == TokenType.L_PAREN){
+        else if(tokenType.equals(TokenType.L_PAREN)){
             return 4;
         }
-        else if(tokenType == TokenType.R_PAREN){
+        else if(tokenType.equals(TokenType.R_PAREN)){
             return 5;
         }
-        else if(tokenType == TokenType.LT){
+        else if(tokenType.equals(TokenType.LT)){
             return 6;
         }
-        else if(tokenType == TokenType.GT){
+        else if(tokenType.equals(TokenType.GT)){
             return 7;
         }
-        else if(tokenType == TokenType.LE){
+        else if(tokenType.equals(TokenType.LE)){
             return 8;
         }
-        else if(tokenType == TokenType.GE){
+        else if(tokenType.equals(TokenType.GE)){
             return 9;
         }
-        else if(tokenType == TokenType.EQ){
+        else if(tokenType.equals(TokenType.EQ)){
             return 10;
         }
-        else if(tokenType == TokenType.NEQ){
+        else if(tokenType.equals(TokenType.NEQ)){
             return 11;
         }
-        else if(tokenType == TokenType.NEG){
+        else if(tokenType.equals(TokenType.NEG)){
             return 12;
         }
         return -1;

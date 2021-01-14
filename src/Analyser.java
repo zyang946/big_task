@@ -653,7 +653,7 @@ public final class Analyser {
         type = analyseExpr();
         if(!type.equals("int") && !type.equals("double"))
             throw new AnalyzeError(ErrorCode.NotType, peekedToken.getStartPos());
-        while(!op.empty()){
+            while(!op.empty()){
             int in = Operation.getOrder(op.peek());
             int out = Operation.getOrder(TokenType.NEG);
             if (Operation.priority[in][out] > 0)
