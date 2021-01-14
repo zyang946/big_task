@@ -1,24 +1,32 @@
-let a: int = 0;
-let b: int = 1;
+fn is_odd(x: int) -> int {
+    return (x / 2 * 2) - x;
+}
 
-fn swap() -> void {
-    let temp: int = a;
-    a = b;
-    b = temp;
+fn fastpow(base: int, exp: int) -> int {
+    let res: int = 1;
+    if exp < 0 {
+        return 0;
+    }
+    while exp > 0 {
+        if is_odd(exp) {
+            res = res * base;
+        }
+        base = base * base;
+        exp = exp / 2;
+    }
+    return res;
 }
 
 fn main() -> void {
-    a = getint();
-    b = getint();
-    
-    putint(a);
-    putchar(32);
-    putint(b);
-    putln();
-
-    swap();
-    
-    putint(a);
-    putchar(32);
-    putint(b);
+    let base: int;
+    let exp: int;
+    let count: int;
+    count = getint();
+    while count > 0 {
+        base = getint();
+        exp = getint();
+        putint(fastpow(base,exp));
+        putln();
+        count = count - 1;
+    }
 }

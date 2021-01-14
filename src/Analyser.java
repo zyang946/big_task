@@ -291,7 +291,7 @@ public final class Analyser {
      */
     public HashMap<String,SymbolEntry> analyseFunction_param_list(String name,SymbolEntry symbol) throws CompileError{
         HashMap<String,SymbolEntry> params = new HashMap<>();
-        int i=0;
+        int i=1;
         params.put(i+"",analyseFunction_param(name,i));
         while(check(TokenType.COMMA)){
             expect(TokenType.COMMA);
@@ -503,7 +503,6 @@ public final class Analyser {
     public void analyseIf_stmt() throws CompileError{
         expect(TokenType.IF_KW);
         String type = analyseExpr();
-        System.out.println(op.peek());
         while(!op.empty()){
             Operation.OperationInstruction(op.pop(), instructions, type);
         }
@@ -676,9 +675,9 @@ public final class Analyser {
         if(symbol.paramId!=-1){
             String returnType = find(symbol.getFunctionName()).getReturnType();
             if(returnType.equals("void"))
-                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()-1));
             else
-                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()+1));
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
         }
         else if(symbol.floor !=1)
             instructions.add(new Instruction(OperationType.loca,symbol.getLocalId()));
@@ -746,9 +745,9 @@ public final class Analyser {
         if(symbol.paramId!=-1){
             String type = find(symbol.getFunctionName()).getReturnType();
             if(type.equals("void"))
-                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()-1));
             else
-                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()+1));
+                instructions.add(new Instruction(OperationType.arga,symbol.getParamId()));
         }
         else if(symbol.floor !=1)
             instructions.add(new Instruction(OperationType.loca,symbol.getLocalId()));
@@ -820,10 +819,11 @@ public final class Analyser {
         //System.out.println(type);
         while(!op.empty()&&op.peek()!=TokenType.L_PAREN)
             Operation.OperationInstruction(op.pop(),instructions,type);
-        //System.out.println(params.get(num+"").getType());
+        System.out.println(params.get(num+""));
         if(!type.equals(params.get(num+"").getType())){
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         }
+        num++;
         while(check(TokenType.COMMA)){
             next();
             type = analyseExpr();
@@ -834,7 +834,7 @@ public final class Analyser {
             }
             num++;
         }
-        if(num!=paramNum)
+        if((num-1)!=paramNum)
             throw new AnalyzeError(ErrorCode.Break,peekedToken.getStartPos());
         }
     /**

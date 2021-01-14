@@ -34,9 +34,7 @@ public class Tokenizer {
             return String_Literal();
         } else if(peek == '\\'){
             return Char_Literal();
-        }else if(peek == '/'){
-            return Comment();
-        }else {
+        } else {
             return OperatorOrUnknown();
         }
     }
