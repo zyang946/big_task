@@ -117,7 +117,7 @@ public class Tokenizer {
         String value = "";
         value += it.nextChar();
         char peek = it.peekChar();
-        int flag = 70000;
+        int flag = 65535;
         while(peek != '"'){
             flag--;
             if(peek=='\\'){
