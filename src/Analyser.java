@@ -24,6 +24,11 @@ public final class Analyser {
     LinkedHashMap<String, FunctionEntry> FunctionTable = new LinkedHashMap<>();
     //标准库表
     HashMap<String, SymbolEntry> libraryTable = SymbolEntry.getLibraryTable();
+    //break和continue有多个，所以必须要链表
+    ArrayList<BreakAndContinue> breakInstructions = new ArrayList<>();
+    ArrayList<BreakAndContinue> continueInstructions = new ArrayList<>();
+    int whileNum=0;
+
     //正在运行的函数
     SymbolEntry runningFunction = new SymbolEntry();
     //刚刚结束的函数
@@ -331,6 +336,8 @@ public final class Analyser {
         | return_stmt
         | block_stmt
         | empty_stmt
+        | break_stmt
+        | continue_stmt
 
      */
     public void analyseStmt() throws CompileError{
@@ -349,6 +356,10 @@ public final class Analyser {
             analyseIf_stmt();
         else if(check(TokenType.WHILE_KW))
             analyseWhile_stmt();
+        else if(check(TokenType.BREAK_KW))
+            analyseBreak_stmt();
+        else if(check(TokenType.CONTINUE_KW))
+            analyseContinue_stmt();
         else
             analyseExpr_stmt();
     }
@@ -568,6 +579,7 @@ public final class Analyser {
         Instruction jump = new Instruction(OperationType.br,0);
         instructions.add(jump);
         int j= instructions.size();
+        whileNum++;
         analyseBlock_stmt();
         Instruction jumpback = new Instruction(OperationType.br,0);
         instructions.add(jumpback);
@@ -575,6 +587,46 @@ public final class Analyser {
         jumpback.setX(i-k);
         jump.setX(k-j);
         
+        for(BreakAndContinue b : breakInstructions){
+            if(b.getWhileNum()==whileNum)
+                b.getInstruction().setX(k-b.getLocal());
+        }
+        System.out.println("continue"+continueInstructions.size());
+        for(BreakAndContinue c : continueInstructions){
+            if(c.getWhileNum()==whileNum)
+                c.getInstruction().setX(i-c.getLocal());
+        }
+        whileNum--;
+        if(whileNum==0){
+            breakInstructions = new ArrayList<>();
+            continueInstructions = new ArrayList<>();
+        }
+    }
+    /**
+     * break_stmt -> 'break' ';'
+     * @return
+     * @throws CompileError
+     */
+    public void analyseBreak_stmt() throws CompileError{
+        expect(TokenType.BREAK_KW);
+
+        Instruction  instruction = new Instruction(OperationType.br,0);
+        breakInstructions.add(new BreakAndContinue(instruction,instructions.size()+1,whileNum));
+        instructions.add(instruction);
+        expect(TokenType.SEMICOLON);
+    }
+
+    /**
+     * continue_stmt -> 'continue' ';'
+     * @return
+     * @throws CompileError
+     */
+    public void analyseContinue_stmt() throws CompileError{
+        expect(TokenType.CONTINUE_KW);
+        Instruction instruction = new Instruction(OperationType.br,0);
+        continueInstructions.add(new BreakAndContinue(instruction, instructions.size()+1,whileNum));
+        instructions.add(instruction);
+        expect(TokenType.SEMICOLON);
     }
        /**
      * 表达式分析函数
