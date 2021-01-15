@@ -517,7 +517,6 @@ public final class Analyser {
         while(!op.empty()){
             Operation.OperationInstruction(op.pop(), instructions, type);
         }
-
         if(!type.equals("int")&&!type.equals("double"))
             throw new AnalyzeError(ErrorCode.Break, peekedToken.getStartPos());
         instructions.add(new Instruction(OperationType.br_true,1));
@@ -704,8 +703,8 @@ public final class Analyser {
         op.push(TokenType.NEG);
         type = analyseExpr();
         if(!type.equals("int") && !type.equals("double"))
-            throw new AnalyzeError(ErrorCode.NotType, peekedToken.getStartPos());
-            while(!op.empty()){
+                throw new AnalyzeError(ErrorCode.NotType, peekedToken.getStartPos());
+        while(!op.empty()){
             int in = Operation.getOrder(op.peek());
             int out = Operation.getOrder(TokenType.NEG);
             if (Operation.priority[in][out] > 0)
@@ -849,7 +848,8 @@ public final class Analyser {
             analyseCall_param_list(symbol);
         }
         expect(TokenType.R_PAREN);
-        op.pop();
+        if(!op.empty())
+            op.pop();
 
         if(library!=null){
             globalTable.add(new GlobalEntry(true, name.length(),name));
@@ -902,9 +902,10 @@ public final class Analyser {
         //System.out.println(type);
         expect(TokenType.R_PAREN);
 
-        while(!op.peek().equals(TokenType.L_PAREN))
+        while(!op.peek().equals(TokenType.L_PAREN)&&!op.empty())
             Operation.OperationInstruction(op.pop(),instructions,type);
-        op.pop();
+        if(!op.empty())
+            op.pop();
         return type;
     }
     /**
@@ -937,10 +938,9 @@ public final class Analyser {
      */
     public String analyseOperator_expr(String type) throws CompileError {
         Token token = next();
-        while(!op.empty()&&!op.peek().equals(TokenType.L_PAREN)){
+        if(!op.empty()&&!op.peek().equals(TokenType.L_PAREN)){
             int in = Operation.getOrder(op.peek());
             int out = Operation.getOrder(token.getTokenType());
-            System.out.println(Operation.priority[in][out]);
             if (Operation.priority[in][out] > 0){
                 Operation.OperationInstruction(op.pop(), instructions, type);
             }
