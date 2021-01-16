@@ -50,11 +50,18 @@ public class Tokenizer {
         Pos startPos = it.currentPos();
         char peek = it.peekChar();
         String num = "";
-        while(Character.isDigit(peek)){
+        while(Character.isDigit(peek)||peek=='.'){
             num += it.nextChar();
             peek = it.peekChar();
         }
-        System.out.println(num);
+        if(peek =='E'||peek=='e'){
+            num += it.nextChar();
+            peek =it.peekChar();
+            while(peek=='+'||peek=='-'||Character.isDigit(peek)){
+                num+=it.nextChar();
+                peek=it.peekChar();
+            }
+        }
         if(Pattern.matches("[0-9]+", num)){
             return new Token(TokenType.UINT_LITERAL,Long.parseLong(num),startPos,it.currentPos());
         }

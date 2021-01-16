@@ -679,10 +679,10 @@ public final class Analyser {
         else if(check(TokenType.L_PAREN)){
             type = analyseGroup_expr();
         }
-        while(check(TokenType.AS)||check(TokenType.PLUS)||check(TokenType.MINUS)||check(TokenType.MUL)||check(TokenType.DIV)||
+        while(check(TokenType.AS_KW)||check(TokenType.PLUS)||check(TokenType.MINUS)||check(TokenType.MUL)||check(TokenType.DIV)||
               check(TokenType.EQ)||check(TokenType.NEQ)||check(TokenType.LT)||check(TokenType.LE)||check(TokenType.GE)||check(TokenType.GT)){
             
-            if(check(TokenType.AS)){
+            if(check(TokenType.AS_KW)){
                 type = analyseAs_expr(type);
             }
             else{
@@ -915,9 +915,10 @@ public final class Analyser {
      */
     public String analyseAs_expr(String type) throws CompileError{
         String newtype = "";
-        expect(TokenType.AS);
+        expect(TokenType.AS_KW);
         Token token = next();
         newtype = (String)token.getValue();
+        System.out.println(newtype);
         if(newtype.equals("int")&&type.equals("double"))
             instructions.add(new Instruction(OperationType.itof,-1));
         else if(newtype.equals("double")&&type.equals("int"))
