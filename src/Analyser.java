@@ -920,9 +920,9 @@ public final class Analyser {
         newtype = (String)token.getValue();
         System.out.println(newtype);
         if(newtype.equals("int")&&type.equals("double"))
-            instructions.add(new Instruction(OperationType.itof,-1));
-        else if(newtype.equals("double")&&type.equals("int"))
             instructions.add(new Instruction(OperationType.ftoi,-1));
+        else if(newtype.equals("double")&&type.equals("int"))
+            instructions.add(new Instruction(OperationType.itof,-1));
         else if(newtype.equals(type))
             return newtype;
         else
