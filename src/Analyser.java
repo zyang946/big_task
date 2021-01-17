@@ -486,9 +486,9 @@ public final class Analyser {
         if(check(TokenType.ASSIGN)){
             isInitialized = true;
             if(floor==1)
-                instructions.add(new Instruction(OperationType.globa,-1));
+                instructions.add(new Instruction(OperationType.globa,globalNum));
             else
-                instructions.add(new Instruction(OperationType.loca,-1));
+                instructions.add(new Instruction(OperationType.loca,localNum));
             expect(TokenType.ASSIGN);
             String newtype = analyseExpr();
             if(!newtype.equals(type))
@@ -499,8 +499,10 @@ public final class Analyser {
         }
         expect(TokenType.SEMICOLON);
         addSymbol(name,token.getStartPos(),true,type,isInitialized,false,null,-1,null,null,floor,globalNum,localNum);
-        if(floor==1)
+        if(floor==1){
             globalNum++;
+            globalTable.add(new GlobalEntry(true,0,name));
+        }
         else
             localNum++;  
     }
